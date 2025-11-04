@@ -67,7 +67,7 @@ private:
 
 	// Constants for rehashing
 	static const double LOAD_FACTOR;
-	static const size_t DEFAULT_CAPACITY = 16;
+	static const size_t DEFAULT_CAPACITY = 32; // Larger initial capacity
 
 	// Private helper methods
 	size_t hash_key(const Key& key) const {
@@ -81,27 +81,22 @@ private:
 			new_table[i] = nullptr;
 		}
 
-		// Rehash all existing elements
-		Node* current = head->next;
-		while (current != tail) {
-			size_t index = hash_func(current->data->first) % new_size;
-			HashEntry* entry = new HashEntry(current);
-			entry->next = new_table[index];
-			new_table[index] = entry;
-			current = current->next;
-		}
-
-		// Clean up old table
+		// Rehash all existing elements - move existing HashEntry objects instead of creating new ones
 		for (size_t i = 0; i < table_size; ++i) {
-			HashEntry* current = table[i];
-			while (current) {
-				HashEntry* temp = current;
-				current = current->next;
-				delete temp;
+			HashEntry* entry = table[i];
+			while (entry) {
+				HashEntry* next_entry = entry->next;
+				size_t new_index = hash_func(entry->node->data->first) % new_size;
+
+				// Move to new table
+				entry->next = new_table[new_index];
+				new_table[new_index] = entry;
+
+				entry = next_entry;
 			}
 		}
-		delete[] table;
 
+		delete[] table;
 		table = new_table;
 		table_size = new_size;
 	}
@@ -664,7 +659,7 @@ public:
 };
 
 template<class Key, class T, class Hash, class Equal>
-const double linked_hashmap<Key, T, Hash, Equal>::LOAD_FACTOR = 0.75;
+const double linked_hashmap<Key, T, Hash, Equal>::LOAD_FACTOR = 0.8; // Higher load factor to reduce rehashing
 
 }
 
