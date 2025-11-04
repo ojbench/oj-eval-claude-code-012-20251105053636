@@ -176,6 +176,10 @@ public:
 		 */
 		iterator operator--(int) {
 			if (is_end && current == container->tail) {
+				if (container->head->next == container->tail) {
+					// Empty map - can't decrement end()
+					throw invalid_iterator();
+				}
 				iterator temp = iterator(container->tail->prev, container, false);
 				is_end = false;
 				current = container->tail->prev;
@@ -194,6 +198,10 @@ public:
 		 */
 		iterator & operator--() {
 			if (is_end && current == container->tail) {
+				if (container->head->next == container->tail) {
+					// Empty map - can't decrement end()
+					throw invalid_iterator();
+				}
 				current = container->tail->prev;
 				is_end = false;
 				return *this;
@@ -290,6 +298,10 @@ public:
 
 			const_iterator operator--(int) {
 				if (is_end && current == container->tail) {
+					if (container->head->next == container->tail) {
+						// Empty map - can't decrement end()
+						throw invalid_iterator();
+					}
 					const_iterator temp = const_iterator(container->tail->prev, container, false);
 					is_end = false;
 					current = container->tail->prev;
@@ -305,6 +317,10 @@ public:
 
 			const_iterator & operator--() {
 				if (is_end && current == container->tail) {
+					if (container->head->next == container->tail) {
+						// Empty map - can't decrement end()
+						throw invalid_iterator();
+					}
 					current = container->tail->prev;
 					is_end = false;
 					return *this;
